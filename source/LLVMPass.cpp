@@ -86,30 +86,22 @@ struct MyModPassStart : public PassInfoMixin<MyModPassStart> {
                             + kBasicBlockClusterPrefixName + std::to_string(bb_idx),
                             kBasicBlockClusterPrefixName + std::to_string(bb_idx),
                             kBasicBlockClusterColor, kClusterBorderColor);
-            PrintBasicBlockClusterBody(B);
+            PrintBasicBlockClusterNodes(B);
             PrintClusterEnd();
+            bb_idx++;
+        }
+        for (auto &B : F) {
+            PrintBasicBlockClusterEdges(B);
             bb_idx++;
         }
     };
 
-    void PrintBasicBlockClusterBody(BasicBlock &B) {
+    void PrintBasicBlockClusterNodes(BasicBlock &B) {
         Instruction* prev_i = &(B.front());
         size_t i_idx = 0;
         for (auto &I : B) {
-            if (i_idx != 0) {
-                AddEdge(std::to_string(size_t(prev_i)), std::to_string(size_t(&I)),
-                        kCFGEdgeColor);
-                prev_i = &I;
-            }
-            i_idx++;
-
             AddNode(std::to_string(size_t(&I)), [prev_i](){outs() << prev_i->getOpcodeName();},
                     kDefaultNodeFillColor);
-
-            for (auto &U : I.uses()) {
-                AddEdge(std::to_string(size_t(&I)), std::to_string(size_t(U.getUser())),
-                        kDFGEdgeColor);
-            }
 
             for (auto &U : I.operands()) {
                 Value *use = U.get();
@@ -128,6 +120,33 @@ struct MyModPassStart : public PassInfoMixin<MyModPassStart> {
                         const_int->getValue().print(outs(), true);
                     }
                 }, kExtraNodeFillColor);
+            }
+        }
+    };
+
+    void PrintBasicBlockClusterEdges(BasicBlock &B) {
+        Instruction* prev_i = &(B.front());
+        size_t i_idx = 0;
+        for (auto &I : B) {
+            if (i_idx != 0) {
+                AddEdge(std::to_string(size_t(prev_i)), std::to_string(size_t(&I)),
+                        kCFGEdgeColor);
+                prev_i = &I;
+            }
+            i_idx++;
+
+            for (auto &U : I.uses()) {
+                AddEdge(std::to_string(size_t(&I)), std::to_string(size_t(U.getUser())),
+                        kDFGEdgeColor);
+            }
+
+            for (auto &U : I.operands()) {
+                Value *use = U.get();
+                Instruction* instr = nullptr;
+                instr = dyn_cast<Instruction, Value>(use);
+                if (instr != nullptr) {
+                    continue;
+                }
 
                 AddEdge(std::to_string(size_t(&U)), std::to_string(size_t(&I)), kExtraEdgeColor);
             }
