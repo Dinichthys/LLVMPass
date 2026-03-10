@@ -14,10 +14,12 @@
 
 ### Примеры графа
 
-#### [fact.c](examples/fact.c)
+#### Граф для программы из файла [fact.c](examples/fact.c)
+
+Во-первых я проверил свой граф на примере из репозитория [llvm_course](https://github.com/lisitsynSA/llvm_course/tree/main). Граф можно посмотреть в файле [fact.svg](data/fact.svg).
 
 <details>
-<summary> Содержание программы fact.c из папки examples </summary>
+<summary> Содержимое программы fact.c из папки examples </summary>
 
 ``` C++
 #include <errno.h>
@@ -54,4 +56,31 @@ int main(int argc, char **argv) {
 
 </details>
 
-![](data/fact.svg){ width=10% }
+<div style="width: 100%; height: 800px; overflow: auto; border: 3px solid #707070;">
+  <img src="data/fact.svg" alt="fact.c" style="max-height: none; max-width: 100%;">
+</div>
+
+#### Граф для программы из файла [stack.cpp](examples/Stack/stack.cpp)
+
+Так же в качестве примера графа относительно большого модуля можно привести граф, построенный для файла из моего репозитория [Stack](https://github.com/Dinichthys/Stack). Содержимое файла можно посмотреть в файле [stack.cpp](examples/Stack/stack.cpp). Граф же можно посмотреть в файле [stack.svg](data/stack.svg).
+
+<div style="width: 100%; height: 800px; overflow: auto; border: 3px solid #707070;">
+  <img src="data/stack.svg" alt="stack.cpp" style="max-height: none; max-width: 1000%;">
+</div>
+
+## Build
+
+Для сборки проекта запустите следующий скрипт
+
+``` bash
+cmake -S . -B build
+cmake --build build
+```
+
+## Usage
+
+Для использования плагина запустить следующий скрипт
+
+``` bash
+sh run.sh ваш_файл_для_анализа.cpp
+```
