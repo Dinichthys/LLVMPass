@@ -1,0 +1,3 @@
+[submodule "examples/Stack"]
+	path = examples/Stack
+	url = https://github.com/Dinichthys/Stack
