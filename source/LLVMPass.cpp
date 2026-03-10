@@ -8,6 +8,7 @@ static const std::string kModuleClusterPrefixName = "module_";
 static const std::string kModuleClusterColor = "#E0E0E0";
 static const std::string kFuncClusterPrefixName = "func_";
 static const std::string kFuncClusterColor = "#D0D0D0";
+static const std::string kFuncDeclarationNodeColor = "#E0E080";
 static const std::string kBasicBlockClusterPrefixName = "basicblock_";
 static const std::string kBasicBlockClusterColor = "#C0C0C0";
 static const std::string kClusterBorderColor = "blue";
@@ -17,6 +18,7 @@ static const std::string kExtraNodeFillColor = "#90F0C0";
 static const std::string kNodeBorderColor = "black";
 static const std::string kDFGEdgeColor = "black";
 static const std::string kCFGEdgeColor = "red";
+static const std::string kCallEdgeColor = "blue";
 static const std::string kExtraEdgeColor = "green";
 static const std::string kEdgeWeight = std::to_string(10);
 
@@ -69,6 +71,13 @@ struct MyModPassStart : public PassInfoMixin<MyModPassStart> {
     void PrintModuleClusterBody(size_t module_idx, Module &M) {
         size_t func_idx = 0;
         for (auto &F : M) {
+            if (F.isDeclaration()) {
+                Function *func_ptr = &F;
+                AddNode(std::to_string(size_t(&F)), [func_ptr](){outs() << demangle(func_ptr->getName());},
+                        kFuncDeclarationNodeColor);
+                continue;
+            }
+
             PrintClusterStart(kModuleClusterPrefixName + std::to_string(module_idx)
                             + kFuncClusterPrefixName + std::to_string(func_idx), demangle(F.getName()),
                             kFuncClusterColor, kClusterBorderColor);
@@ -97,10 +106,10 @@ struct MyModPassStart : public PassInfoMixin<MyModPassStart> {
     };
 
     void PrintBasicBlockClusterNodes(BasicBlock &B) {
-        Instruction* prev_i = &(B.front());
         size_t i_idx = 0;
         for (auto &I : B) {
-            AddNode(std::to_string(size_t(&I)), [prev_i](){outs() << prev_i->getOpcodeName();},
+            Instruction *inst_ptr = &I;
+            AddNode(std::to_string(size_t(&I)), [inst_ptr](){outs() << inst_ptr->getOpcodeName();},
                     kDefaultNodeFillColor);
 
             for (auto &U : I.operands()) {
@@ -151,17 +160,26 @@ struct MyModPassStart : public PassInfoMixin<MyModPassStart> {
                 AddEdge(std::to_string(size_t(&U)), std::to_string(size_t(&I)), kExtraEdgeColor);
             }
 
-            if (auto *Br = dyn_cast<llvm::BranchInst>(&I)) {
+            if (auto *Br = dyn_cast<BranchInst>(&I)) {
                 size_t suc_num = Br->getNumSuccessors();
                 for (size_t suc_bb_idx = 0; suc_bb_idx < suc_num; suc_bb_idx++) {
                     auto *suc_bb = Br->getSuccessor(suc_bb_idx);
                     AddEdge(std::to_string(size_t(&I)), std::to_string(size_t(&(suc_bb->front()))), kCFGEdgeColor);
                 }
-            } else if (auto *S = dyn_cast<llvm::SwitchInst>(&I)) {
+            } else if (auto *S = dyn_cast<SwitchInst>(&I)) {
                 size_t suc_num = S->getNumSuccessors();
                 for (size_t suc_bb_idx = 0; suc_bb_idx < suc_num; suc_bb_idx++) {
                     auto *suc_bb = S->getSuccessor(suc_bb_idx);
                     AddEdge(std::to_string(size_t(&I)), std::to_string(size_t(&(suc_bb->front()))), kCFGEdgeColor);
+                }
+            } else if (auto *C = dyn_cast<CallBase>(&I)) {
+                Function *func_ptr = C->getCalledFunction();
+                if (Function *func = dyn_cast<Function>(func_ptr)) {
+                    if (&(func->front().front()) != nullptr) {
+                        AddEdge(std::to_string(size_t(&I)), std::to_string(size_t(&(func->front().front()))), kCallEdgeColor);
+                    } else if (func->isDeclaration()) {
+                        AddEdge(std::to_string(size_t(&I)), std::to_string(size_t(func)), kCallEdgeColor);
+                    }
                 }
             }
         }

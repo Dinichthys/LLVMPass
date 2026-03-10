@@ -3,6 +3,8 @@ project (Pass CXX)
 
 set(CMAKE_CXX_COMPILER clang++)
 
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/log)
+
 add_library (${PROJECT_NAME}
     SHARED
         source/LLVMPass.cpp
