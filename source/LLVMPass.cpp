@@ -36,6 +36,8 @@ struct MyModPass : public PassInfoMixin<MyModPass> {
         PrintClusterEnd();
         ModuleIdx++;
 
+        PrintEndGraph();
+
         return PreservedAnalyses::all();
     };
 
@@ -46,6 +48,10 @@ struct MyModPass : public PassInfoMixin<MyModPass> {
                 "\tgraph [rankdir = \"TB\"];\n"
                 "\tranksep = 1.5;\n"
                 "\tsplines = ortho;\n\n";
+    };
+
+    void PrintEndGraph() {
+        outs() << "}\n";
     };
 
     void PrintClusterStart(const std::string_view &cluster_name, const std::string_view &cluster_label,
