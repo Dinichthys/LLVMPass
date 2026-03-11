@@ -22,21 +22,8 @@ static const std::string kCallEdgeColor = "blue";
 static const std::string kExtraEdgeColor = "green";
 static const std::string kEdgeWeight = std::to_string(10);
 
-void PrintStartGraph() {
-    outs() << "digraph\n{\n"
-            "\tfontname = \"Helvetica,Arial,sans-serif\";\n"
-            "\tnode [fontname = \"Helvetica,Arial,sans-serif\"];\n"
-            "\tgraph [rankdir = \"TB\"];\n"
-            "\tranksep = 1.5;\n"
-            "\tsplines = ortho;\n\n";
-};
-
-void PrintEndGraph() {
-    outs() << "}\n";
-};
-
 static size_t ModuleIdx = 0;
-struct MyModPassStart : public PassInfoMixin<MyModPassStart> {
+struct MyModPass : public PassInfoMixin<MyModPass> {
 
     PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
         if (ModuleIdx == 0) {
@@ -49,9 +36,16 @@ struct MyModPassStart : public PassInfoMixin<MyModPassStart> {
         PrintClusterEnd();
         ModuleIdx++;
 
-        PrintEndGraph();
-
         return PreservedAnalyses::all();
+    };
+
+    void PrintStartGraph() {
+        outs() << "digraph\n{\n"
+                "\tfontname = \"Helvetica,Arial,sans-serif\";\n"
+                "\tnode [fontname = \"Helvetica,Arial,sans-serif\"];\n"
+                "\tgraph [rankdir = \"TB\"];\n"
+                "\tranksep = 1.5;\n"
+                "\tsplines = ortho;\n\n";
     };
 
     void PrintClusterStart(const std::string_view &cluster_name, const std::string_view &cluster_label,
@@ -101,7 +95,6 @@ struct MyModPassStart : public PassInfoMixin<MyModPassStart> {
         }
         for (auto &B : F) {
             PrintBasicBlockClusterEdges(B);
-            bb_idx++;
         }
     };
 
@@ -217,16 +210,16 @@ struct MyModPassEnd : public PassInfoMixin<MyModPassEnd> {
         }
         return PreservedAnalyses::all();
     };
+
+    void PrintEndGraph() {
+        outs() << "}\n";
+    };
 };
 
 PassPluginLibraryInfo getPassPluginInfo() {
     const auto callback = [](PassBuilder &PB) {
-        // PB.registerPipelineStartEPCallback([](ModulePassManager &MPM, auto) {
-        // MPM.addPass(MyModPassStart{});
-        // return true;
-        // });
         PB.registerOptimizerLastEPCallback([](ModulePassManager &MPM, auto) {
-        MPM.addPass(MyModPassStart{});
+        MPM.addPass(MyModPass{});
         return true;
         });
     };
