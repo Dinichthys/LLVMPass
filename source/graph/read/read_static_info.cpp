@@ -1,6 +1,7 @@
 #include "graph/read/read_static_info.hpp"
 
 #include <fstream>
+#include <assert.h>
 
 #include "graph/graph.hpp"
 #include "pass/static_info_constants.hpp"
@@ -44,6 +45,8 @@ StaticInfoReadError ReadStaticInfo(graph::Cluster *root) {
 }
 
 static StaticInfoReadError ReadStaticInfoFromFile(graph::Cluster *root, std::ifstream &in) {
+    assert(root);
+
     StaticInfoReadError error = StaticInfoReadError::kDone;
     while (!in.eof()) {
         std::string key_word_str;
@@ -105,6 +108,8 @@ static KeyWord GetKeyWordEnum(const std::string &key_word) {
 }
 
 static StaticInfoReadError ReadCluster(graph::Cluster *root, std::ifstream &in) {
+    assert(root);
+
     std::string cluster_name, cluster_color, cluster_label, cluster_border_color;
     std::getline(in, cluster_name);
     std::getline(in, cluster_color);
@@ -120,6 +125,8 @@ static StaticInfoReadError ReadCluster(graph::Cluster *root, std::ifstream &in) 
 }
 
 static StaticInfoReadError ReadSubCluster(graph::Cluster *root, std::ifstream &in) {
+    assert(root);
+
     graph::Cluster *subcluster = new(std::nothrow) graph::Cluster;
     if (subcluster == nullptr) {
         return StaticInfoReadError::kBadAlloc;
@@ -131,6 +138,8 @@ static StaticInfoReadError ReadSubCluster(graph::Cluster *root, std::ifstream &i
 }
 
 static StaticInfoReadError ReadNode(graph::Cluster *root, std::ifstream &in) {
+    assert(root);
+
     std::string node_name, node_label, node_color, node_border_color;
     std::getline(in, node_name);
     std::getline(in, node_label);
@@ -153,6 +162,8 @@ static StaticInfoReadError ReadNode(graph::Cluster *root, std::ifstream &in) {
 }
 
 static StaticInfoReadError ReadEdge(graph::Cluster *root, std::ifstream &in) {
+    assert(root);
+
     std::string start, end, color;
     std::getline(in, start);
     std::getline(in, end);

@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(Pass CXX C)
 
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_C_COMPILER clang)
 
@@ -152,6 +153,8 @@ add_executable(${BUILD_GRAPH}
     source/graph/read/read_static_info.cpp
     source/graph/read/read_dynamic_info.cpp
 
+    source/graph/analyze/analyze.cpp
+
     source/graph/write/write_graph.cpp
 )
 
@@ -165,6 +168,8 @@ target_compile_options(${BUILD_GRAPH}
         -fdiagnostics-color=always
 
         -I /usr/lib/llvm-18/include
+
+        -std=c++20
 
         -Wall
         # -Wextra

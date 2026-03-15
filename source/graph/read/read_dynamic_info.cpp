@@ -1,6 +1,7 @@
 #include "graph/read/read_dynamic_info.hpp"
 
 #include <fstream>
+#include <assert.h>
 
 #include "graph/graph.hpp"
 #include "pass/log_func.h"
@@ -31,6 +32,8 @@ DynamicInfoReadError ReadDynamicInfo(graph::Cluster *module) {
 }
 
 static DynamicInfoReadError ReadModuleDynamicInfo(graph::Cluster *module, std::ifstream &in) {
+    assert(module);
+
     DynamicInfoReadError error = DynamicInfoReadError::kDone;
     size_t func_idx = 0;
     graph::Cluster *func = nullptr;

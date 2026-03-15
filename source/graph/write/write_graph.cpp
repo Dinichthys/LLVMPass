@@ -1,6 +1,7 @@
 #include "graph/write/write_graph.hpp"
 
 #include <fstream>
+#include <assert.h>
 
 namespace wg {
 
@@ -40,6 +41,8 @@ WriteGraphError WriteGraph(const graph::Cluster *module) {
 }
 
 static void WriteGraphInfo(const graph::Cluster *cluster, std::ofstream &out, bool show_entrance) {
+    assert(cluster);
+
     WriteClusterStart(cluster, out, show_entrance);
 
     WriteNodes(cluster, out);
@@ -50,6 +53,8 @@ static void WriteGraphInfo(const graph::Cluster *cluster, std::ofstream &out, bo
 }
 
 static void WriteNodes(const graph::Cluster *cluster, std::ofstream &out) {
+    assert(cluster);
+
     for (const auto *node : cluster->GetChildren()) {
         const graph::Cluster *subcluster = dynamic_cast<const graph::Cluster*>(node);
         if (subcluster) {
@@ -61,6 +66,8 @@ static void WriteNodes(const graph::Cluster *cluster, std::ofstream &out) {
 }
 
 static void WriteEdges(const graph::Cluster *cluster, std::ofstream &out) {
+    assert(cluster);
+
     for (const auto &edge : cluster->GetEdges()) {
         WriteEdgeInfo(edge, out);
     }
@@ -80,6 +87,8 @@ static void WriteEndGraph(std::ofstream &out) {
 }
 
 static void WriteClusterStart(const graph::Cluster *cluster, std::ofstream &out, bool show_entrance) {
+    assert(cluster);
+
     out << "\tsubgraph " << cluster->GetName() << " {\n"
             "\t\tnode [style=filled];\n"
             "\t\tstyle=\"filled\";\n"
@@ -96,6 +105,8 @@ static void WriteClusterEnd(std::ofstream &out) {
 }
 
 static void WriteNodeInfo(const graph::Node *node, std::ofstream &out) {
+    assert(node);
+
     out << "\t\"" << node->GetName() << "\"\n\t[\n"
             "\t\tlabel = \"" << node->GetLabel() << "\"\n"
             "\t\tshape = \"record\"\n"
