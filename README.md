@@ -2,7 +2,9 @@
 
 ## Цель задачи
 
-Цель задачи заключалась в том, чтобы написать **пасс-плагин** в **LLVM**, который бы строил **Control Flow Graph** и **Data Flow Graph** для инструкций, а так же переходов между базовыми блоками и вызовов функций.
+Цель задачи заключалась в том, чтобы написать **пасс-плагин** в **LLVM**, который бы строил **Control Flow Graph** и **Data Flow Graph** для инструкций, а так же граф переходов между базовыми блоками и вызовами функций. Также плагин должен инструментировать **LLVM IR**, добавив вызовы функций, логирующих входы в тела функций и базовых блоков.
+
+После сбора профиля программы, полученного с помощью этих инструкций, надо построить граф с учётом статической и динамической информации.
 
 ## Реализованный граф
 
@@ -16,7 +18,7 @@
 
 #### Граф для программы из файла [fact.c](examples/fact.c)
 
-Во-первых я проверил свой граф на примере из репозитория [llvm_course](https://github.com/lisitsynSA/llvm_course/tree/main). Граф можно посмотреть в файле [fact.svg](data/fact.svg).
+Во-первых я проверил свой граф на примере из репозитория [llvm_course](https://github.com/lisitsynSA/llvm_course/tree/main). Граф без динамического профиля можно посмотреть в файле [fact.svg](data/fact.svg), а с ним - в [fact_10.svg](data/fact_10.svg)
 
 <details>
 <summary> Содержимое программы fact.c из папки examples </summary>
@@ -56,17 +58,45 @@ int main(int argc, char **argv) {
 
 </details>
 
+<details>
+<summary> Граф программы без учёта динамического профиля </summary>
+
 <div style="width: 100%; height: 800px; overflow: auto; border: 3px solid #707070;">
   <img src="data/fact.svg" alt="fact.c" style="max-height: none; max-width: 100%;">
 </div>
 
+</details>
+
+<details>
+<summary> Граф программы с учётом динамического профиля (производился запуск для вычисления факториала 10) </summary>
+
+<div style="width: 100%; height: 800px; overflow: auto; border: 3px solid #707070;">
+  <img src="data/fact_10.svg" alt="fact.c" style="max-height: none; max-width: 100%;">
+</div>
+
+</details>
+
 #### Граф для программы из файла [stack.cpp](examples/Stack/stack.cpp)
 
-Так же в качестве примера графа относительно большого модуля можно привести граф, построенный для файла из моего репозитория [Stack](https://github.com/Dinichthys/Stack). Содержимое файла можно посмотреть в файле [stack.cpp](examples/Stack/stack.cpp). Граф же можно посмотреть в файле [stack.svg](data/stack.svg).
+Так же в качестве примера графа относительно большого модуля можно привести граф, построенный для файла из моего репозитория [Stack](https://github.com/Dinichthys/Stack). Содержимое файла можно посмотреть в файле [stack.cpp](examples/Stack/stack.cpp). Граф без динамического профиля же можно посмотреть в файле [stack.svg](data/stack.svg), а с ним - в [stack_100.svg](data/stack_100.svg).
+
+<details>
+<summary> Граф программы без учёта динамического профиля </summary>
 
 <div style="width: 100%; height: 800px; overflow: auto; border: 3px solid #707070;">
   <img src="data/stack.svg" alt="stack.cpp" style="max-height: none; max-width: 1000%;">
 </div>
+
+</details>
+
+<details>
+<summary> Граф программы с учётом динамического профиля (производился запуск для создания стека и добавления в него 100 элементов) </summary>
+
+<div style="width: 100%; height: 800px; overflow: auto; border: 3px solid #707070;">
+  <img src="data/stack_100.svg" alt="stack.cpp" style="max-height: none; max-width: 1000%;">
+</div>
+
+</details>
 
 ## Build
 
@@ -79,8 +109,23 @@ cmake --build build
 
 ## Usage
 
-Для использования плагина запустить следующий скрипт
+Если Ваша программа состоит из одного файла, тогда для использования плагина запустить следующий скрипт
 
 ``` bash
-sh run.sh ваш_файл_для_анализа.cpp
+sh scripts/run.sh ваш_файл_для_анализа.cpp
 ```
+
+Иначе воспользуйтесь данным скриптом, чтобы получить объектный файл, который затем сможете слинковать с Вашим проектом
+
+``` bash
+sh scripts/build_target.sh ваш_файл_для_анализа.cpp
+```
+
+На выходе получится объектный файл `res.o`, который будет находиться в папке `log`. После сборки Вашего проекта и запуска его, проследуйте следующим действиям
+
+``` bash
+./build/build_graph
+dot -Tsvg log/tmp.dot -o log/tmp.svg
+```
+
+В результате получится граф с учётом динамического профиля `tmp.svg` в папке `log`.

@@ -1,3 +1,5 @@
+#include <iostream>
+
 #include "graph/graph.hpp"
 
 #include "graph/read/read_static_info.hpp"
@@ -10,10 +12,19 @@
 int main() {
     graph::Cluster root;
 
-    rsi::ReadStaticInfo(&root);
-    rdi::ReadDynamicInfo(&root);
+    if (rsi::ReadStaticInfo(&root) != rsi::StaticInfoReadError::kDone) {
+        std::cerr << "Error in static info\n";
+    }
 
-    ag::AnalyzeGraph(&root);
+    if (rdi::ReadDynamicInfo(&root) != rdi::DynamicInfoReadError::kDone) {
+        std::cerr << "Error in dynamic info\n";
+    }
 
-    wg::WriteGraph(&root);
+    if (ag::AnalyzeGraph(&root) != ag::AnalyzerError::kDone) {
+        std::cerr << "Error in analyzing\n";
+    }
+
+    if (wg::WriteGraph(&root) != wg::WriteGraphError::kDone) {
+        std::cerr << "Error in writing graph\n";
+    }
 }

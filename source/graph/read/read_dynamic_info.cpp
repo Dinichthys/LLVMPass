@@ -42,12 +42,15 @@ static DynamicInfoReadError ReadModuleDynamicInfo(graph::Cluster *module, std::i
     while (!in.eof()) {
         std::string key_word_str;
         in >> key_word_str;
+        if (in.eof() && (key_word_str.length() == 0)) {
+            break;
+        }
         KeyWord key_word = GetKeyWordEnum(key_word_str);
 
         switch (key_word) {
             case KeyWord::kFunc : {
                 in >> func_idx;
-                func = dynamic_cast<graph::Cluster*>(module->GetChild(func_idx));
+                func = module->GetSubCluster(func_idx);
                 if (func == nullptr) {
                     return DynamicInfoReadError::InvalidDynamicInfo;
                 }
@@ -60,7 +63,7 @@ static DynamicInfoReadError ReadModuleDynamicInfo(graph::Cluster *module, std::i
                     return DynamicInfoReadError::InvalidDynamicInfo;
                 }
                 in >> bb_idx;
-                bb = dynamic_cast<graph::Cluster*>(func->GetChild(bb_idx));
+                bb = func->GetSubCluster(bb_idx);
                 if (bb == nullptr) {
                     return DynamicInfoReadError::InvalidDynamicInfo;
                 }

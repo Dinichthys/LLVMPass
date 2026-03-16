@@ -55,13 +55,12 @@ static void WriteGraphInfo(const graph::Cluster *cluster, std::ofstream &out, bo
 static void WriteNodes(const graph::Cluster *cluster, std::ofstream &out) {
     assert(cluster);
 
-    for (const auto *node : cluster->GetChildren()) {
-        const graph::Cluster *subcluster = dynamic_cast<const graph::Cluster*>(node);
-        if (subcluster) {
-            WriteGraphInfo(subcluster, out, true);
-        } else {
-            WriteNodeInfo(node, out);
-        }
+    for (const auto *sub_cluster : cluster->GetSubClusters()) {
+        WriteGraphInfo(sub_cluster, out, true);
+    }
+
+    for (const auto *node : cluster->GetNodes()) {
+        WriteNodeInfo(node, out);
     }
 }
 

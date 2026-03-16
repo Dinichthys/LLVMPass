@@ -3,3 +3,4 @@ build
 log
 *.o
 *.so
+compile_commands.json

@@ -34,22 +34,14 @@ static AnalyzerError AnalyzeCluster(graph::Cluster *root) {
 
     size_t max_entrance = 0;
 
-    std::vector<graph::Cluster*> subclusters = {};
-    for (auto *node : root->GetChildren()) {
-        graph::Cluster *subcluster = dynamic_cast<graph::Cluster*>(node);
-        if (subcluster == nullptr) {
-            continue;
-        }
-
-        subclusters.push_back(subcluster);
-
-        max_entrance = std::max(max_entrance, subcluster->GetEntrance());
+    for (auto *sub_cluster : root->GetSubClusters()) {
+        max_entrance = std::max(max_entrance, sub_cluster->GetEntrance());
     }
 
-    for (auto *subcluster : subclusters) {
-        AnalyzeCluster(subcluster);
+    for (auto *sub_cluster : root->GetSubClusters()) {
+        AnalyzeCluster(sub_cluster);
 
-        ChangeClusterColor(subcluster, max_entrance);
+        ChangeClusterColor(sub_cluster, max_entrance);
     }
 
     return AnalyzerError::kDone;
@@ -67,11 +59,15 @@ static void ChangeClusterColor(graph::Cluster *root, size_t max_entrance) {
 
     size_t color_num = std::stoi(color.substr(1, color.length() - 1).c_str(), nullptr, 16);
 
-    size_t new_color_num = color_num
-                            + (((kMaxColor - ((color_num & kRedColor) >> (kByteSize * 2)))
-                                * entrance_num / max_entrance) << (kByteSize * 2))
-                            + ((kMaxColor - (color_num & kBlueColor))
-                                * (max_entrance - entrance_num) / max_entrance);
+    size_t new_color_num = color_num;
+    if (max_entrance > 0) {
+        new_color_num += (((kMaxColor - ((color_num & kRedColor) >> (kByteSize * 2)))
+                            * entrance_num / max_entrance) << (kByteSize * 2))
+                        + ((kMaxColor - (color_num & kBlueColor))
+                            * (max_entrance - entrance_num) / max_entrance);
+    } else {
+        new_color_num += kMaxColor - (color_num & kBlueColor);
+    }
 
     root->SetColor(kHexColorSym + std::format("{:06X}", new_color_num));
 }

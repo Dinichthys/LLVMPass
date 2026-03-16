@@ -59,7 +59,7 @@ static void InsertFuncStartLog(llvm::Module &M, llvm::Function &F, size_t func_i
     llvm::FunctionCallee log_func =
         M.getOrInsertFunction(kStartFuncLogFuncName, log_func_type);
 
-    builder.SetInsertPoint(&(F.front().front()));
+    builder.SetInsertPoint(F.getEntryBlock().getFirstInsertionPt());
     llvm::Value *func_name = llvm::ConstantInt::get(int64_type, func_idx);
     llvm::Value *args[] = {func_name};
     builder.CreateCall(log_func, args);
@@ -76,7 +76,7 @@ static void InsertBBStartLog(llvm::Module &M, llvm::BasicBlock &B, size_t bb_idx
     llvm::FunctionCallee log_func =
         M.getOrInsertFunction(kStartBBLogFuncName, log_func_type);
 
-    builder.SetInsertPoint(&(B.front()));
+    builder.SetInsertPoint(B.getFirstInsertionPt());
     llvm::Value *bb_name = llvm::ConstantInt::get(int64_type, bb_idx);
     llvm::Value *args[] = {bb_name};
     builder.CreateCall(log_func, args);

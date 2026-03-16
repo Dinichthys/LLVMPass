@@ -127,14 +127,14 @@ static StaticInfoReadError ReadCluster(graph::Cluster *root, std::ifstream &in) 
 static StaticInfoReadError ReadSubCluster(graph::Cluster *root, std::ifstream &in) {
     assert(root);
 
-    graph::Cluster *subcluster = new(std::nothrow) graph::Cluster;
-    if (subcluster == nullptr) {
+    graph::Cluster *sub_cluster = new(std::nothrow) graph::Cluster;
+    if (sub_cluster == nullptr) {
         return StaticInfoReadError::kBadAlloc;
     }
 
-    root->AddChild(subcluster);
+    root->AddChild(sub_cluster);
 
-    return ReadCluster(subcluster, in);
+    return ReadCluster(sub_cluster, in);
 }
 
 static StaticInfoReadError ReadNode(graph::Cluster *root, std::ifstream &in) {

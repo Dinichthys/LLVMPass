@@ -88,7 +88,9 @@ class Node {
 
 class Cluster : virtual public Node {
     private:
-        std::vector<Node*> children_;
+        std::vector<Cluster*> sub_clusters_;
+
+        std::vector<Node*> nodes_;
 
         std::vector<Edge> edges_;
 
@@ -96,25 +98,46 @@ class Cluster : virtual public Node {
 
     public:
         Cluster()
-            :Node(), children_(), edges_(), entrance_(0) {};
+            :Node(), sub_clusters_(), nodes_(), edges_(), entrance_(0) {};
+
+        ~Cluster() {
+            for (auto *child : sub_clusters_) {
+                delete child;
+            }
+            for (auto *child : nodes_) {
+                delete child;
+            }
+        };
 
         void AddChild(Node *child) {
-            children_.push_back(child);
+            nodes_.push_back(child);
+        };
+        void AddChild(Cluster *child) {
+            sub_clusters_.push_back(child);
         };
 
         void AddEdge(const Edge edge) {
             edges_.push_back(edge);
         };
 
-        Node *GetChild(size_t idx) const {
-            if (idx >= children_.size()) {
+        Cluster *GetSubCluster(size_t idx) const {
+            if (idx >= sub_clusters_.size()) {
                 return nullptr;
             }
-            return children_[idx];
+            return sub_clusters_[idx];
+        };
+        Node *GetNode(size_t idx) const {
+            if (idx >= nodes_.size()) {
+                return nullptr;
+            }
+            return nodes_[idx];
         };
 
-        const std::vector<Node*> &GetChildren() const {
-            return children_;
+        const std::vector<Cluster*> &GetSubClusters() const {
+            return sub_clusters_;
+        };
+        const std::vector<Node*> &GetNodes() const {
+            return nodes_;
         };
 
         const std::vector<Edge> &GetEdges() const {
