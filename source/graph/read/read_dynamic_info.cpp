@@ -11,7 +11,8 @@ namespace rdi {
 enum KeyWord {
     kInvalid = -1,
     kFunc = 0,
-    kBasicBlock
+    kBasicBlock,
+    kCall
 };
 
 static DynamicInfoReadError ReadModuleDynamicInfo(graph::Cluster *module, std::ifstream &in);
@@ -71,6 +72,15 @@ static DynamicInfoReadError ReadModuleDynamicInfo(graph::Cluster *module, std::i
                 break;
             };
 
+            case KeyWord::kCall : {
+                in >> func_idx;
+                func = module->GetSubCluster(func_idx);
+                if (func == nullptr) {
+                    return DynamicInfoReadError::InvalidDynamicInfo;
+                }
+                break;
+            };
+
             case KeyWord::kInvalid : {
                 return DynamicInfoReadError::kInvalidKeyWord;
             };
@@ -86,6 +96,9 @@ static KeyWord GetKeyWordEnum(const std::string &key_word) {
     }
     if (key_word == kBBEnterKeyWord) {
         return KeyWord::kBasicBlock;
+    }
+    if (key_word == kCallFuncKeyWord) {
+        return KeyWord::kCall;
     }
     return KeyWord::kInvalid;
 }
