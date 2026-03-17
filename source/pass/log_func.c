@@ -39,19 +39,19 @@ void StartBBLog(size_t bb_idx) {
     fprintf(LogFile, "%s %lu\n", kBBEnterKeyWord, bb_idx);
 }
 
-void CallFuncLog(size_t func_idx) {
+void CallFuncLog(size_t func_idx, size_t bb_idx) {
     if (LogFile == NULL) {
         if (!TriedOpenFile) {
             OpenLogFile();
         }
         if (LogFile == NULL) {
-            fprintf(stderr, "%s %lu\n", kCallFuncKeyWord, func_idx);
+            fprintf(stderr, "%s %lu %lu\n", kCallFuncKeyWord, func_idx, bb_idx);
         } else {
-            fprintf(LogFile, "%s %lu\n", kCallFuncKeyWord, func_idx);
+            fprintf(LogFile, "%s %lu %lu\n", kCallFuncKeyWord, func_idx, bb_idx);
         }
         return;
     }
-    fprintf(LogFile, "%s %lu\n", kCallFuncKeyWord, func_idx);
+    fprintf(LogFile, "%s %lu %lu\n", kCallFuncKeyWord, func_idx, bb_idx);
 }
 
 static void OpenLogFile() {

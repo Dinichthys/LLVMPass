@@ -19,6 +19,7 @@ static const char kHexColorSym = '#';
 
 static AnalyzerError AnalyzeCluster(graph::Cluster *root);
 
+static AnalyzerError AnalyzeClusterEntrance(graph::Cluster *root);
 static void ChangeClusterColor(graph::Cluster *root, size_t max_entrance);
 
 AnalyzerError AnalyzeGraph(graph::Cluster *root) {
@@ -32,6 +33,21 @@ AnalyzerError AnalyzeGraph(graph::Cluster *root) {
 static AnalyzerError AnalyzeCluster(graph::Cluster *root) {
     assert(root);
 
+    AnalyzerError error = AnalyzerError::kDone;
+
+    error = AnalyzeClusterEntrance(root);
+    if (error != AnalyzerError::kDone) {
+        return error;
+    }
+
+    return AnalyzerError::kDone;
+}
+
+static AnalyzerError AnalyzeClusterEntrance(graph::Cluster *root) {
+    assert(root);
+
+    AnalyzerError error = AnalyzerError::kDone;
+
     size_t max_entrance = 0;
 
     for (auto *sub_cluster : root->GetSubClusters()) {
@@ -39,12 +55,15 @@ static AnalyzerError AnalyzeCluster(graph::Cluster *root) {
     }
 
     for (auto *sub_cluster : root->GetSubClusters()) {
-        AnalyzeCluster(sub_cluster);
+        error = AnalyzeClusterEntrance(sub_cluster);
+        if (error != AnalyzerError::kDone) {
+            return error;
+        }
 
         ChangeClusterColor(sub_cluster, max_entrance);
     }
 
-    return AnalyzerError::kDone;
+    return error;
 }
 
 static void ChangeClusterColor(graph::Cluster *root, size_t max_entrance) {

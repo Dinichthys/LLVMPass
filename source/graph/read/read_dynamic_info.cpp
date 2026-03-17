@@ -78,6 +78,11 @@ static DynamicInfoReadError ReadModuleDynamicInfo(graph::Cluster *module, std::i
                 if (func == nullptr) {
                     return DynamicInfoReadError::InvalidDynamicInfo;
                 }
+                in >> bb_idx;
+                bb = func->GetSubCluster(bb_idx);
+                if (bb == nullptr) {
+                    return DynamicInfoReadError::InvalidDynamicInfo;
+                }
                 break;
             };
 

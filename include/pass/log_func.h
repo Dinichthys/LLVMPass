@@ -6,7 +6,7 @@
 
 void StartFuncLog(size_t func_idx);
 void StartBBLog(size_t bb_idx);
-void CallFuncLog(size_t func_idx);
+void CallFuncLog(size_t func_idx, size_t bb_idx);
 
 static const char* const kStartFuncLogFuncName = WORD_TO_STR(StartFuncLog);
 static const char* const kStartBBLogFuncName = WORD_TO_STR(StartBBLog);
